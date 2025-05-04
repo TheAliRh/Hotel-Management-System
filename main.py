@@ -20,6 +20,16 @@ class Customer:
     status: str = None
 
 
+class Reservation:
+    id: str = None
+    firstname: str = None
+    lastname: str = None
+    customer_id: str = None
+    checkin_date: str = None
+    checkout_date: str = None
+    room_number: int = None
+
+
 # Test data
 
 users = {1: {"username": "admin", "password": "admin"}}
@@ -35,6 +45,18 @@ customers = {
 }
 
 rooms = {1: {"room_number": 1, "type": "master", "status": "empty"}}
+
+reservations = {
+    1: {
+        "id": "1",
+        "firstname": "john",
+        "lastname": "doe",
+        "id": "059 999 99 99",
+        "checkin_date": "1-1-2025",
+        "checkout_date": "1-2-2025",
+        "room_number": 1,
+    }
+}
 
 # POST methods
 
@@ -89,7 +111,7 @@ def get_customers():
     return customers
 
 
-@app.get("/api/customer/{customer_id}")  # Return customer info by id
+@app.get("/api/customers/{customer_id}")  # Return customer info by id
 def get_customer_by_id(customer_id: int):
     return customers[customer_id]
 
@@ -99,7 +121,7 @@ def get_rooms():
     return rooms
 
 
-@app.get("/api/room/{room_number}")  # Return room by number
+@app.get("/api/rooms/{room_number}")  # Return room by number
 def get_room_by_number(room_number: int):
     return rooms[room_number]
 
@@ -109,9 +131,21 @@ def get_users():
     return users
 
 
-@app.get("/api/user/{user_id}")  # Return user by id
+@app.get("/api/users/{user_id}")  # Return user by id
 def get_user(user_id: int):
     return users[user_id]
+
+
+@app.get("/api/reservations")  # Return all reservarions
+def get_reservations():
+    return reservations
+
+
+@app.get("/api/reservations/{reserve_id}")  # Return reservation
+def get_reservation(reserve_id):
+    for reserve in reservations:
+        if reservations[reserve]["id"] == reserve_id:
+            return reservations[reserve]
 
 
 # PUT methods
