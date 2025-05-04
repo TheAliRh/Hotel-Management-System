@@ -104,6 +104,16 @@ def get_room_by_number(room_number: int):
     return rooms[room_number]
 
 
+@app.get("/api/users")  # Return all users
+def get_users():
+    return users
+
+
+@app.get("/api/user/{user_id}")  # Return user by id
+def get_user(user_id: int):
+    return users[user_id]
+
+
 # PUT methods
 
 
