@@ -12,6 +12,14 @@ class Room:
     status: str = None
 
 
+class Customer:
+    firstname: str = None
+    lastname: str = None
+    id: str = None
+    nationality: str = None
+    status: str = None
+
+
 # Test data
 
 users = {1: {"username": "admin", "password": "admin"}}
