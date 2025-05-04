@@ -3,6 +3,15 @@ from fastapi import FastAPI
 # making an instance of the FastAPI
 app = FastAPI()
 
+# Test class
+
+
+class Room:
+    number: int = None
+    type: str = None
+    status: str = None
+
+
 # Test data
 
 users = {1: {"username": "admin", "password": "admin"}}
