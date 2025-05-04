@@ -40,7 +40,9 @@ rooms = {1: {"room_number": 1, "type": "master", "status": "empty"}}
 
 
 @app.post("/api/login")  # Login authentication
-def login(username: str, password: str):
+def login(
+    username: str, password: str
+):  # Needs database implementation and creating authentication
     for user in users:
         if users[user]["username"] == username and users[user]["password"] == password:
             return {"Error": f"User {username} already exists!"}
@@ -48,7 +50,9 @@ def login(username: str, password: str):
 
 
 @app.post("/api/sign-up")  # Creating new user
-def post_user(username: str, password: str):
+def post_user(
+    username: str, password: str
+):  # Needs database implementation and creating authentication
     return {"Message": f"new user {username} added successfully!"}
 
 
@@ -80,14 +84,24 @@ def post_room(number: int, type: str, status: str, room=Room):
 # GET methods
 
 
-@app.get("/api/customers")
+@app.get("/api/customers")  # Return all customers
 def get_customers():
     return customers
 
 
-@app.get("/api/rooms")
+@app.get("/api/customer/{customer_id}")  # Return customer info by id
+def get_customer_by_id(customer_id: int):
+    return customers[customer_id]
+
+
+@app.get("/api/rooms")  # Return all rooms
 def get_rooms():
     return rooms
+
+
+@app.get("/api/room/{room_number}")  # Return room by number
+def get_room_by_number(room_number: int):
+    return rooms[room_number]
 
 
 # PUT methods
