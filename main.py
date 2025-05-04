@@ -42,8 +42,9 @@ rooms = {1: {"room_number": 1, "type": "master", "status": "empty"}}
 @app.post("/api/login")  # Login authentication
 def login(username: str, password: str):
     for user in users:
-        if user["username"] == username and user["password"] == password:
-            return {"Message": f"User {username} loged in successfully!"}
+        if users[user]["username"] == username and users[user]["password"] == password:
+            return {"Error": f"User {username} already exists!"}
+    return {"Message": f"User {username} loged in successfully!"}
 
 
 @app.post("/api/sign-up")  # Creating new user
@@ -53,16 +54,16 @@ def post_user(username: str, password: str):
 
 @app.post("/api/new-customer")  # Creating new customer
 def post_customer(
-    firstname: str, lastname: str, id: str, nationality: str, customer=Customer
+    firstname: str, lastname: str, id: str, nationality: str, new_customer=Customer
 ):
     for customer in customers:
-        if customer["id"] == id:
+        if customers[customer]["id"] == id:
             return {"Error": f"Customer with id {id} already exists"}
-    customer.firstname = firstname
-    customer.lastname = lastname
-    customer.id = id
-    customer.nationality = nationality
-    customer.status = "present"
+    new_customer.firstname = firstname
+    new_customer.lastname = lastname
+    new_customer.id = id
+    new_customer.nationality = nationality
+    new_customer.status = "present"
     return {"Message": "customer successfully added!"}
 
 
