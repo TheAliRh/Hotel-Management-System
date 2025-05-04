@@ -52,12 +52,27 @@ def post_user(username: str, password: str):
 
 
 @app.post("/api/new-customer")  # Creating new customer
-def post_customer():
+def post_customer(
+    firstname: str, lastname: str, id: str, nationality: str, customer=Customer
+):
+    for customer in customers:
+        if customer["id"] == id:
+            return {"Error": f"Customer with id {id} already exists"}
+    customer.firstname = firstname
+    customer.lastname = lastname
+    customer.id = id
+    customer.nationality = nationality
+    customer.status = "present"
     return {"Message": "customer successfully added!"}
 
 
 @app.post("/api/new-room")  # Creating new room
-def post_room():
+def post_room(number: int, type: str, status: str, room=Room):
+    if number in rooms:
+        return {"Error": f"room number {number} already exists"}
+    room.number = number
+    room.type = type
+    room.status = status
     return {"Message": "room successfully added!"}
 
 
