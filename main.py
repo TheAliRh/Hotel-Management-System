@@ -22,23 +22,26 @@ rooms = {1: {"room_number": 1, "type": "master", "status": "empty"}}
 # POST methods
 
 
-# Login authentication
-@app.post("/api/login")
+@app.post("/api/login")  # Login authentication
 def login(username: str, password: str):
     for user in users:
         if user["username"] == username and user["password"] == password:
             return {"Message": f"User {username} loged in successfully!"}
 
 
-# Creating new user
-@app.post("/api/sign-up")
-def new_user(username: str, password: str):
+@app.post("/api/sign-up")  # Creating new user
+def post_user(username: str, password: str):
     return {"Message": f"new user {username} added successfully!"}
 
 
-@app.post("/api/new-customer")
+@app.post("/api/new-customer")  # Creating new customer
 def post_customer():
     return {"Message": "customer successfully added!"}
+
+
+@app.post("/api/new-room")  # Creating new room
+def post_room():
+    return {"Message": "room successfully added!"}
 
 
 # GET methods
