@@ -4,6 +4,9 @@ from fastapi import FastAPI
 app = FastAPI()
 
 # Test data
+
+users = {1: {"username": "admin", "password": "admin"}}
+
 customers = {
     1: {
         "firstname": "john",
@@ -19,9 +22,18 @@ rooms = {1: {"room_number": 1, "type": "master", "status": "empty"}}
 # POST methods
 
 
+# Login authentication
 @app.post("/api/login")
 def login(username: str, password: str):
-    pass
+    for user in users:
+        if user["username"] == username and user["password"] == password:
+            return {"Message": f"User {username} loged in successfully!"}
+
+
+# Creating new user
+@app.post("/api/sign-up")
+def new_user(username: str, password: str):
+    return {"Message": f"new user {username} added successfully!"}
 
 
 @app.post("/api/new-customer")
@@ -48,6 +60,7 @@ def get_rooms():
 @app.put("/api/room/{room_number}")
 def update_room(room_number: int, status: str):
     rooms[room_number]["status"] = status
+    return {"Message": "Room updated successfully!"}
 
 
 # Delete methods
