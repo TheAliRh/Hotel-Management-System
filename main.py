@@ -206,3 +206,34 @@ def update_reservation(
 
 
 # Delete methods
+
+
+@app.delete("/api/users/{user_id}")  # Delete user
+def delete_user(user_id: int, username: str, password: str):
+    if (
+        users[user_id]["username"] == username
+        and users[user_id]["password"] == password
+    ):
+        del users[user_id]
+        return {"Message": f"User '{username}' deleted successfully!"}
+
+
+@app.delete("/api/customers/{customer_id}")  # Delete customer
+def delete_customer(id: int, customer_id: str):
+    if customers[id]["id"] == customer_id:
+        del customers[id]
+        return {"Message": f"Customer '{customer_id}' deleted successfully!"}
+
+
+@app.delete("/api/reservations/{reserve_id}")  # Delete reservation
+def delete_reseravtion(reserve_id: str):
+    for reserve in reservations:
+        if reservations[reserve]["reserve_id"] == reserve_id:
+            del reservations[reserve]
+            return {"Message": f"Reservation '{reserve_id}' deleted successfully!"}
+
+
+@app.delete("/api/rooms/{room_number}")  # Delete room
+def delete_room(room_number: int):
+    del rooms[room_number]
+    {"Message": f"Room '{room_number}' deleted successfully!"}
