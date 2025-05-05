@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-# making an instance of the FastAPI
+# making the FastAPI app
 app = FastAPI()
 
 # Test class
@@ -48,7 +48,7 @@ rooms = {1: {"room_number": 1, "type": "master", "status": "empty"}}
 
 reservations = {
     1: {
-        "id": "1",
+        "reserve_id": "1",
         "firstname": "john",
         "lastname": "doe",
         "id": "059 999 99 99",
@@ -151,10 +151,58 @@ def get_reservation(reserve_id):
 # PUT methods
 
 
-@app.put("/api/room/{room_number}")
+@app.put("/api/rooms/{room_number}")  # Update room info
 def update_room(room_number: int, status: str):
     rooms[room_number]["status"] = status
     return {"Message": "Room updated successfully!"}
+
+
+@app.put("/api/customers/{customer_id}")  # Update customer info
+def update_customer(
+    customer_id: str,
+    firstname: str,
+    lastname: str,
+    id: str,
+    nationality: str,
+    status: str,
+):
+    for customer in customers:
+        if customers[customer]["id"] == customer_id:
+            customers[customer]["firstname"] = firstname
+            customers[customer]["lastname"] = lastname
+            customers[customer]["id"] = id
+            customers[customer]["nationality"] = nationality
+            customers[customer]["status"] = status
+    return {"Message": "Customer updated successfully!"}
+
+
+@app.put("/api/users/{user_id}")  # Update user info
+def update_user(user_id: int, username: str, password: str):
+    users[user_id]["username"] = username
+    users[user_id]["password"] = password
+    return {"Message": "User updated successfully!"}
+
+
+@app.put("/api/reservations/{reserve_id}")  # Update reservation info
+def update_reservation(
+    reserve_id: str,
+    firstname: str,
+    lastname: str,
+    customer_id: str,
+    checkin_date: str,
+    checkout_date: str,
+    room_number: int,
+):
+    for reserve in reservations:
+        if reservations[reserve]["reserve_id"] == reserve_id:
+            reservations[reserve]["firstname"] = firstname
+            reservations[reserve]["lastname"] = lastname
+            reservations[reserve]["customer_id"] = customer_id
+            reservations[reserve]["checkin_date"] = checkin_date
+            reservations[reserve]["checkout_date"] = checkout_date
+            reservations[reserve]["room_number"] = room_number
+
+    return {"Message": "Reservation updated successfully!"}
 
 
 # Delete methods
