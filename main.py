@@ -1,4 +1,13 @@
 from fastapi import FastAPI
+from pymongo import MongoClient
+
+# Mongo database config
+
+client = MongoClient("localhost", 27017)
+
+
+# Database Initialization
+
 
 # making the FastAPI app
 app = FastAPI()
