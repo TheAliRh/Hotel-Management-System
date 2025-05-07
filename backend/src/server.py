@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from pymongo import MongoClient
 
+from . import dal
+from test import test
+
 # Mongo database config
 
 client = MongoClient("localhost", 27017)
@@ -8,6 +11,16 @@ client = MongoClient("localhost", 27017)
 
 # making the FastAPI app
 app = FastAPI()
+
+
+# temporary initialization
+Room = dal.Room
+Customer = dal.Customer
+
+users = test.users
+customers = test.customers
+rooms = test.rooms
+reservations = test.reservations
 
 # POST methods
 
@@ -31,7 +44,7 @@ def post_user(
 
 @app.post("/api/new-customer")  # Creating new customer
 def post_customer(
-    firstname: str, lastname: str, id: str, nationality: str, new_customer=Customer
+    firstname: str, lastname: str, id: str, nationality: str, new_customer: Customer
 ):
     for customer in customers:
         if customers[customer]["id"] == id:
@@ -45,7 +58,7 @@ def post_customer(
 
 
 @app.post("/api/new-room")  # Creating new room
-def post_room(number: int, type: str, status: str, room=Room):
+def post_room(number: int, type: str, status: str, room: Room):
     if number in rooms:
         return {"Error": f"room number {number} already exists"}
     room.number = number
