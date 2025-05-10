@@ -16,20 +16,33 @@ from test import test
 
 COLLECTION_NAME = "hotel_management"
 MONGODB_URI = os.environ["MONGODB_URI"]
-DEBUGE = os.environ.get("DEBUGE", "").stripe().lower() in {"1", "true", "on", "yes"}
-
-# Mongo database config
-
-client = MongoClient("localhost", 27017)
+DEBUG = os.environ.get("DEBUGE", "").stripe().lower() in {"1", "true", "on", "yes"}
 
 
-# making the FastAPI app
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup:
+    client = AsyncIOMotorClient(MONGODB_URI)
+    database = client.get_default_database()
+
+    # Ensure the database is available:
+    pong = await database.command("ping")
+    if int(pong["ok"]) != 1:
+        raise Exception("Cluster connection is not okay!")
+    hotel_collection = database.get_collection(COLLECTION_NAME)
+    app.tododal = ToDoDAL(hotel_collection)
+
+    # Yield back to fastapi application:
+    yield
+
+    # Shutdown:
+    client.close()
+
+
+app = FastAPI(lifespan=lifespan, debug=DEBUG)
 
 
 # temporary initialization
-Room = dal.Room
-Customer = dal.Customer
 
 users = test.users
 customers = test.customers
