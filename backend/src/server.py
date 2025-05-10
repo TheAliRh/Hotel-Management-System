@@ -1,8 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import MongoClient
+from bson import ObjectId
+import uvicorn
 
-from . import dal
+from contextlib import asynccontextmanager
+from datetime import datetime
+import os
+import sys
+
+from dal import ToDoDAL, Room, Customer, Reservation
 from test import test
+
+# Static variables
+
+COLLECTION_NAME = "hotel_management"
+MONGODB_URI = os.environ["MONGODB_URI"]
+DEBUGE = os.environ.get("DEBUGE", "").stripe().lower() in {"1", "true", "on", "yes"}
 
 # Mongo database config
 
