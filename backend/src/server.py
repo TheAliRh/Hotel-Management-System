@@ -41,32 +41,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, debug=DEBUG)
 
 
-# temporary initialization
-
-users = {1: {"username": "admin", "password": "admin"}}
-customers = {
-    1: {
-        "firstname": "john",
-        "lastname": "doe",
-        "id": "059 999 99 99",
-        "nationality": "Iran",
-        "status": "present",
-    }
-}
-rooms = {1: {"room_number": 1, "type": "master", "status": "empty"}}
-reservations = {
-    1: {
-        "reserve_id": "1",
-        "firstname": "john",
-        "lastname": "doe",
-        "id": "059 999 99 99",
-        "checkin_date": "1-1-2025",
-        "checkout_date": "1-2-2025",
-        "room_number": 1,
-    }
-}
-
-
 # Customer methods
 
 
@@ -87,7 +61,8 @@ async def post_customer(
 
 @app.get("/api/customers")
 def get_customers():
-    return customers
+    pass
+    # return customers
 
 
 @app.get("/api/customers/{customer_id}")
@@ -104,51 +79,65 @@ def update_customer(
     nationality: str,
     status: str,
 ):
-    for customer in customers:
-        if customers[customer]["id"] == customer_id:
-            customers[customer]["firstname"] = firstname
-            customers[customer]["lastname"] = lastname
-            customers[customer]["id"] = id
-            customers[customer]["nationality"] = nationality
-            customers[customer]["status"] = status
+    # for customer in customers:
+    #     if customers[customer]["id"] == customer_id:
+    #         customers[customer]["firstname"] = firstname
+    #         customers[customer]["lastname"] = lastname
+    #         customers[customer]["id"] = id
+    #         customers[customer]["nationality"] = nationality
+    #         customers[customer]["status"] = status
     return {"Message": "Customer updated successfully!"}
 
 
 @app.delete("/api/customers/{customer_id}")
 def delete_customer(id: int, customer_id: str):
-    if customers[id]["id"] == customer_id:
-        del customers[id]
-        return {"Message": f"Customer '{customer_id}' deleted successfully!"}
+    # if customers[id]["id"] == customer_id:
+    #     del customers[id]
+    return {"Message": f"Customer '{customer_id}' deleted successfully!"}
 
 
 # Room methods
 
+"""
+Create new room
+"""
+
 
 @app.post("/api/new-room")
-async def post_room(number: int, type: str, status: str, room: Room) -> Room:
-    return await app.tododal.create_room(number, type, status)
+async def create_new_room(number: int, type: str, status: str) -> str:
+    return await app.tododal.create_room(number=number, type=type, status=status)
 
 
-@app.get("/api/rooms")
-def get_rooms():
-    return rooms
+"""
+List all rooms
+"""
+
+
+# @app.get("/api/rooms")
+# async def list_rooms():
+#     return rooms
+
+
+"""
+Show room info
+"""
 
 
 @app.get("/api/rooms/{room_number}")
-async def get_room_by_number(room_number: int) -> Room:
+async def show_room(room_number: int) -> Room:
     return await app.tododal.get_room(room_number)
 
 
-@app.put("/api/rooms/{room_number}")
-def update_room(room_number: int, status: str):
-    rooms[room_number]["status"] = status
-    return {"Message": "Room updated successfully!"}
+# @app.put("/api/rooms/{room_number}")
+# def update_room(room_number: int, status: str):
+#     rooms[room_number]["status"] = status
+#     return {"Message": "Room updated successfully!"}
 
 
-@app.delete("/api/rooms/{room_number}")
-def delete_room(room_number: int):
-    del rooms[room_number]
-    {"Message": f"Room '{room_number}' deleted successfully!"}
+# @app.delete("/api/rooms/{room_number}")
+# def delete_room(room_number: int):
+#     del rooms[room_number]
+#     {"Message": f"Room '{room_number}' deleted successfully!"}
 
 
 def main(argv=sys.argv[1:]):
