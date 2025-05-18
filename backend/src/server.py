@@ -180,5 +180,15 @@ def main(argv=sys.argv[1:]):
         pass
 
 
+"""
+Server health check status
+"""
+
+
+@app.get("/")
+async def healthcheck():
+    return {"status": "ok"}
+
+
 if __name__ == "__main__":
     main()
