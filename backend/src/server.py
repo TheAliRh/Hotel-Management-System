@@ -9,11 +9,11 @@ from datetime import datetime
 import os
 import sys
 
-from dal import ToDoDAL, Room, Customer, Reservation
+from dal.customer import Customer, CustomerDAL
+from dal.room import Room, RoomDAL
 
 # Static variables
 
-COLLECTION_NAME = "hotel_management"
 MONGODB_URI = ""
 DEBUG = os.environ.get("DEBUGE", "").strip().lower() in {"1", "true", "on", "yes"}
 
@@ -28,8 +28,12 @@ async def lifespan(app: FastAPI):
     pong = await database.command("ping")
     if int(pong["ok"]) != 1:
         raise Exception("Cluster connection is not okay!")
-    hotel_collection = database.get_collection(COLLECTION_NAME)
-    app.tododal = ToDoDAL(hotel_collection)
+
+    customers_collection = database.get_collection("customers_collection")
+    rooms_collection = database.get_collection("rooms_collection")
+
+    app.customer_dal = CustomerDAL(customers_collection)
+    app.room_dal = RoomDAL(rooms_collection)
 
     # Yield back to fastapi application:
     yield
@@ -44,7 +48,12 @@ app = FastAPI(lifespan=lifespan, debug=DEBUG)
 # Customer methods
 
 
-@app.post("/api/new-customer")
+"""
+Create new customer
+"""
+
+
+@app.post("/api/customers/new")
 async def post_customer(
     firstname: str,
     lastname: str,
@@ -54,24 +63,38 @@ async def post_customer(
     new_customer: Customer,
 ) -> Customer:
     new_customer.status = "present"
-    return await app.tododal.create_customer(
+    return await app.customer_dal.create_customer(
         firstname, lastname, id, phone, nationality, new_customer.status
     )
 
 
+"""
+List all customers
+"""
+
+
 @app.get("/api/customers")
-def get_customers():
-    pass
-    # return customers
+async def get_customers():
+    return await app.customer_dal.list_customers()
+
+
+"""
+Show customer
+"""
 
 
 @app.get("/api/customers/{customer_id}")
 async def get_customer_by_id(customer_id: int) -> Customer:
-    return await app.tododal.get_customer(customer_id)
+    return await app.customer_dal.get_customer(customer_id)
+
+
+"""
+Update customer
+"""
 
 
 @app.put("/api/customers/{customer_id}")
-def update_customer(
+async def update_customer(
     customer_id: str,
     firstname: str,
     lastname: str,
@@ -79,33 +102,30 @@ def update_customer(
     nationality: str,
     status: str,
 ):
-    # for customer in customers:
-    #     if customers[customer]["id"] == customer_id:
-    #         customers[customer]["firstname"] = firstname
-    #         customers[customer]["lastname"] = lastname
-    #         customers[customer]["id"] = id
-    #         customers[customer]["nationality"] = nationality
-    #         customers[customer]["status"] = status
-    return {"Message": "Customer updated successfully!"}
+    return await app.customer_dal.update_customer(customer_id)
+
+
+"""
+Delete customer
+"""
 
 
 @app.delete("/api/customers/{customer_id}")
-def delete_customer(id: int, customer_id: str):
-    # if customers[id]["id"] == customer_id:
-    #     del customers[id]
-    return {"Message": f"Customer '{customer_id}' deleted successfully!"}
+async def delete_customer(id: int, customer_id: str):
+    return await app.customer_dal.delete_customer(customer_id)
 
 
 # Room methods
+
 
 """
 Create new room
 """
 
 
-@app.post("/api/new-room")
+@app.post("/api/rooms/new")
 async def create_new_room(number: int, type: str, status: str) -> str:
-    return await app.tododal.create_room(number=number, type=type, status=status)
+    return await app.room_dal.create_room(number=number, type=type, status=status)
 
 
 """
@@ -113,9 +133,9 @@ List all rooms
 """
 
 
-# @app.get("/api/rooms")
-# async def list_rooms():
-#     return rooms
+@app.get("/api/rooms")
+async def list_rooms():
+    return await app.room_dal.list_rooms()
 
 
 """
@@ -125,19 +145,32 @@ Show room info
 
 @app.get("/api/rooms/{room_number}")
 async def show_room(room_number: int) -> Room:
-    return await app.tododal.get_room(room_number)
+    return await app.room_dal.get_room(room_number)
 
 
-# @app.put("/api/rooms/{room_number}")
-# def update_room(room_number: int, status: str):
-#     rooms[room_number]["status"] = status
-#     return {"Message": "Room updated successfully!"}
+"""
+Update room
+"""
 
 
-# @app.delete("/api/rooms/{room_number}")
-# def delete_room(room_number: int):
-#     del rooms[room_number]
-#     {"Message": f"Room '{room_number}' deleted successfully!"}
+@app.put("/api/rooms/{room_number}")
+async def update_room(room_number: int, status: str):
+    return await app.room_dal.update_room(number=room_number)
+
+
+"""
+Delete room
+"""
+
+
+@app.delete("/api/rooms/{room_number}")
+async def delete_room(room_number: int):
+    return await app.room_dal.delete_room(number=room_number)
+
+
+"""
+Run the code
+"""
 
 
 def main(argv=sys.argv[1:]):
