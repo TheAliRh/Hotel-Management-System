@@ -6,6 +6,9 @@ from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorCollection
 
 
+# -------Model--------
+
+
 class Room(BaseModel):
     number: int = None
     type: str = None
@@ -16,6 +19,9 @@ class Room(BaseModel):
         return Room(
             number=int(doc["number"]), type=str(doc["type"]), status=bool(doc["status"])
         )
+
+
+# ---------DAL--------
 
 
 class RoomDAL:

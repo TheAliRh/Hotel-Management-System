@@ -6,6 +6,9 @@ from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorCollection
 
 
+# -----------Model----------
+
+
 class Customer(BaseModel):
     firstname: str = None
     lastname: str = None
@@ -26,6 +29,9 @@ class Customer(BaseModel):
             status=bool(doc["status"]),
             room=int(doc["room"]),
         )
+
+
+# ---------DAL----------
 
 
 class CustomerDAL:
