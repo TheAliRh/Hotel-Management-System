@@ -9,8 +9,10 @@ from datetime import datetime
 import os
 import sys
 
-from dal.customer import Customer, CustomerDAL
-from dal.room import Room, RoomDAL
+from routers.customers import router as customers_router
+from routers.rooms import router as rooms_router
+from dal.customer import CustomerDAL
+from dal.room import RoomDAL
 
 # Static variables
 
@@ -43,6 +45,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan, debug=DEBUG)
+
+
+app.include_router(customers_router)
+app.include_router(rooms_router)
 
 
 """

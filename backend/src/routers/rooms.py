@@ -10,7 +10,7 @@ Create new room
 """
 
 
-@router.post("/api/rooms/new")
+@router.post("/new", response_model=str)
 async def create_new_room(
     number: int,
     type: str,
@@ -25,8 +25,8 @@ List all rooms
 """
 
 
-@router.get("/api/rooms")
-async def list_rooms(dal: RoomDAL = Depends(lambda: router.app.room_dal)):
+@router.get("", response_model=list[Room])
+async def list_rooms(dal: RoomDAL = Depends(lambda: router.app.room_dal)) -> Room:
     return await dal.list_rooms()
 
 
@@ -35,7 +35,7 @@ Show room info
 """
 
 
-@router.get("/api/rooms/{room_number}")
+@router.get("/{room_number}", response_model=Room)
 async def show_room(
     room_number: int, dal: RoomDAL = Depends(lambda: router.app.room_dal)
 ) -> Room:
@@ -47,10 +47,10 @@ Update room
 """
 
 
-@router.put("/api/rooms/{room_number}")
+@router.put("/{room_number}", response_model=Room)
 async def update_room(
     room_number: int, status: str, dal: RoomDAL = Depends(lambda: router.app.room_dal)
-):
+) -> Room:
     return await dal.update_room(number=room_number)
 
 
@@ -59,8 +59,8 @@ Delete room
 """
 
 
-@router.delete("/api/rooms/{room_number}")
+@router.delete("/{room_number}", response_model=bool)
 async def delete_room(
     room_number: int, dal: RoomDAL = Depends(lambda: router.app.room_dal)
-):
+) -> bool:
     return await dal.delete_room(number=room_number)
