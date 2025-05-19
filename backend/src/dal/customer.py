@@ -4,7 +4,7 @@ Isolated data access layer of customers.
 
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorCollection
-
+from bson import ObjectId
 
 # -----------Model----------
 
@@ -82,7 +82,7 @@ class CustomerDAL:
 
     async def get_customer(
         self,
-        id: str = None,
+        id: str | ObjectId = None,
         session=None,
     ) -> Customer:
         doc = await self._customer_collection.find_one(

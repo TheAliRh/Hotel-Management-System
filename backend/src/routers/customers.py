@@ -45,8 +45,8 @@ Show customer
 
 
 @router.get("/{customer_id}", response_model=Customer)
-async def get_customer_by_id(
-    customer_id: int, dal: CustomerDAL = Depends(lambda: router.app.customer_dal)
+async def get_customer(
+    customer_id: str, dal: CustomerDAL = Depends(lambda: router.app.customer_dal)
 ) -> Customer:
     return await dal.get_customer(customer_id)
 
