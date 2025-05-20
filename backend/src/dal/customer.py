@@ -4,6 +4,7 @@ Isolated data access layer of customers.
 
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorCollection
+from fastapi import HTTPException, status
 from bson import ObjectId
 
 # -----------Model----------
@@ -15,7 +16,7 @@ class Customer(BaseModel):
     id: str = None
     phone: str = None
     nationality: str = None
-    status: bool = None  # Active=true, Inactive=False
+    customer_status: bool = None  # Active=true, Inactive=False
     room: int = None
 
     @staticmethod
@@ -26,7 +27,7 @@ class Customer(BaseModel):
             id=str(doc["id"]),
             phone=str(doc["phone"]),
             nationality=str(doc["nationality"]),
-            status=bool(doc["status"]),
+            customer_status=bool(doc["status"]),
             room=int(doc["room"]),
         )
 
@@ -50,10 +51,17 @@ class CustomerDAL:
         id: str = None,
         phone: str = None,
         nationality: str = None,
-        status: bool = None,
+        customer_status: bool = None,
         room: int = None,
         session=None,
     ) -> str:
+        existing = await self._customer_collection.find_one({"id": id})
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"customer with id '{id}' already exists.",
+            )
+
         response = await self._customer_collection.insert_one(
             {
                 "firstname": firstname,
@@ -61,7 +69,7 @@ class CustomerDAL:
                 "id": id,
                 "phone": phone,
                 "nationality": nationality,
-                "status": status,
+                "status": customer_status,
                 "room": room,
             },
             session=session,
@@ -91,6 +99,11 @@ class CustomerDAL:
             },
             session=session,
         )
+        if not doc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"customer id '{id}' not found.",
+            )
         return Customer.from_doc(doc)
 
     """
@@ -102,12 +115,17 @@ class CustomerDAL:
         id: str = None,
         session=None,
     ) -> Customer:
-        doc = await self._customer_collection.find_one(
+        doc = await self._customer_collection.update_one(
             {
                 "id": id,
             },
             session=session,
         )
+        if doc.matched_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"customer id '{id}' not found.",
+            )
         return Customer.from_doc(doc)
 
     """
@@ -125,4 +143,9 @@ class CustomerDAL:
             },
             session=session,
         )
+        if response.deleted_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"customer id '{id}' not found.",
+            )
         return response.deleted_count == 1
