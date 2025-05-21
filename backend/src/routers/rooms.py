@@ -1,8 +1,28 @@
 from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 
 from dal.room import Room, RoomDAL
 
+
 router = APIRouter(prefix="/api/rooms", tags=["rooms"])
+
+
+"""
+Base validation models
+"""
+
+
+class RoomCreate(BaseModel):
+    number: int = Field(..., ge=1, le=1000)
+    type: str = Field(..., min_length=2, max_length=10)
+    room_status: str = Field(..., regex="^(available|occupied|reserved)$")
+
+
+class RoomUpdate(BaseModel):
+    room_status: str = Field(..., regex="^(available|occupied|reserved)$")
+
+
+# ---------Endpoints---------
 
 
 """
@@ -12,12 +32,12 @@ Create new room
 
 @router.post("/new", status_code=status.HTTP_201_CREATED, response_model=str)
 async def create_new_room(
-    number: int,
-    type: str,
-    room_status: str,
+    room: RoomCreate,
     dal: RoomDAL = Depends(lambda: router.app.room_dal),
 ) -> str:
-    return await dal.create_room(number=number, type=type, room_status=room_status)
+    return await dal.create_room(
+        number=room.number, type=room.type, room_status=room.room_status
+    )
 
 
 """
@@ -50,10 +70,10 @@ Update room
 @router.put("/{room_number}", status_code=status.HTTP_200_OK, response_model=Room)
 async def update_room(
     room_number: int,
-    room_status: str,
+    payload: RoomUpdate,
     dal: RoomDAL = Depends(lambda: router.app.room_dal),
 ) -> Room:
-    return await dal.update_room(number=room_number)
+    return await dal.update_room(number=room_number, room_status=payload.room_status)
 
 
 """

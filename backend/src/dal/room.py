@@ -78,9 +78,11 @@ class RoomDAL:
     Update room
     """
 
-    async def update_room(self, number: int = None, session=None) -> Room:
+    async def update_room(
+        self, number: int = None, room_status: str = None, session=None
+    ) -> Room:
         doc = await self._room_collection.update_one(
-            {"number": number}, session=session
+            {"number": number, "status": room_status}, session=session
         )
         if doc.matched_count == 0:
             raise HTTPException(

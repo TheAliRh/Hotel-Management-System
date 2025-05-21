@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 
 from dal.customer import Customer, CustomerDAL
 
@@ -7,23 +8,48 @@ router = APIRouter(prefix="/api/customers", tags=["customers"])
 
 
 """
+Base validation models
+"""
+
+
+class CustomerCreate(BaseModel):
+    firstname: str = Field(..., ge=2, le=20)
+    lastname: str = Field(..., ge=2, le=20)
+    customer_id: str = Field(..., ge=10, le=10)
+    phone: str = Field(..., ge=8, le=12)
+    nationality: str = Field(..., ge=4, le=20)
+
+
+class CustomerUpdate(BaseModel):
+    firstname: str = Field(..., ge=2, le=20)
+    lastname: str = Field(..., ge=2, le=20)
+    customer_id: str = Field(..., ge=10, le=10)
+    phone: str = Field(..., ge=8, le=12)
+    nationality: str = Field(..., ge=4, le=20)
+    customer_status: str = Field(..., regex="^(inactive|present|absent)$")
+
+
+# -----------Endpoints----------
+
+
+"""
 Create new customer
 """
 
 
-@router.post("/new", status_code=status.HTTP_201_CREATED, response_model=Customer)
+@router.post("/new", status_code=status.HTTP_201_CREATED, response_model=str)
 async def create_customer(
-    firstname: str,
-    lastname: str,
-    id: str,
-    phone: str,
-    nationality: str,
-    new_customer: Customer,
+    customer: CustomerCreate,
     dal: CustomerDAL = Depends(lambda: router.app.customer_dal),
-) -> Customer:
-    new_customer.status = "present"
+) -> str:
+    customer_status = "present"
     return await dal.create_customer(
-        firstname, lastname, id, phone, nationality, new_customer.status
+        firstname=customer.firstname,
+        lastname=customer.lastname,
+        customer_id=customer.customer_id,
+        phone=customer.phone,
+        nationality=customer.nationality,
+        customer_status=customer_status,
     )
 
 
@@ -35,7 +61,7 @@ List all customers
 @router.get("", status_code=status.HTTP_200_OK, response_model=list[Customer])
 async def get_customers(
     dal: CustomerDAL = Depends(lambda: router.app.customer_dal),
-) -> Customer:
+) -> list:
     return await dal.list_customers()
 
 
@@ -58,15 +84,10 @@ Update customer
 
 @router.put("/{customer_id}", status_code=status.HTTP_200_OK, response_model=Customer)
 async def update_customer(
-    customer_id: str,
-    firstname: str,
-    lastname: str,
-    id: str,
-    nationality: str,
-    customer_status: str,
+    payload: CustomerUpdate,
     dal: CustomerDAL = Depends(lambda: router.app.customer_dal),
 ) -> Customer:
-    return await dal.update_customer(customer_id)
+    return await dal.update_customer(customer_id=payload.customer_id)
 
 
 """
