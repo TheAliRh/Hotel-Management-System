@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from dal.customer import Customer, CustomerDAL
 
@@ -11,8 +11,8 @@ Create new customer
 """
 
 
-@router.post("/new", response_model=Customer)
-async def post_customer(
+@router.post("/new", status_code=status.HTTP_201_CREATED, response_model=Customer)
+async def create_customer(
     firstname: str,
     lastname: str,
     id: str,
@@ -32,7 +32,7 @@ List all customers
 """
 
 
-@router.get("", response_model=list[Customer])
+@router.get("", status_code=status.HTTP_200_OK, response_model=list[Customer])
 async def get_customers(
     dal: CustomerDAL = Depends(lambda: router.app.customer_dal),
 ) -> Customer:
@@ -44,7 +44,7 @@ Show customer
 """
 
 
-@router.get("/{customer_id}", response_model=Customer)
+@router.get("/{customer_id}", status_code=status.HTTP_200_OK, response_model=Customer)
 async def get_customer(
     customer_id: str, dal: CustomerDAL = Depends(lambda: router.app.customer_dal)
 ) -> Customer:
@@ -56,14 +56,14 @@ Update customer
 """
 
 
-@router.put("/{customer_id}", response_model=Customer)
+@router.put("/{customer_id}", status_code=status.HTTP_200_OK, response_model=Customer)
 async def update_customer(
     customer_id: str,
     firstname: str,
     lastname: str,
     id: str,
     nationality: str,
-    status: str,
+    customer_status: str,
     dal: CustomerDAL = Depends(lambda: router.app.customer_dal),
 ) -> Customer:
     return await dal.update_customer(customer_id)
@@ -74,7 +74,9 @@ Delete customer
 """
 
 
-@router.delete("/{customer_id}", response_model=bool)
+@router.delete(
+    "/{customer_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=bool
+)
 async def delete_customer(
     id: int,
     customer_id: str,
